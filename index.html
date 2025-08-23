@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MUNA - Event RSVP Form</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .muna-logo {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 50%;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .logo-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .custom-logo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            display: none;
+        }
+
+        .default-logo-content {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-crescent {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border: 6px solid #1e3c72;
+            border-radius: 50%;
+            border-right-color: transparent;
+            border-bottom-color: transparent;
+            transform: rotate(45deg);
+        }
+
+        .logo-crescent::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            width: 70px;
+            height: 70px;
+            border: 3px solid #6c757d;
+            border-radius: 50%;
+            border-right-color: transparent;
+            border-bottom-color: transparent;
+            transform: rotate(-10deg);
+        }
+
+        .usa-map {
+            position: absolute;
+            width: 40px;
+            height: 30px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            background: #1e3c72;
+            border-radius: 3px;
+        }
+
+        .usa-map::before {
+            content: 'USA';
+            position: absolute;
+            font-size: 6px;
+            color: white;
+            font-weight: bold;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(45deg);
+        }
+
+        .muna-text {
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            font-weight: bold;
+            color: #6c757d;
+            letter-spacing: 2px;
+        }
+
+        .admin-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1e3c72;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9em;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .admin-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            animation: modalAppear 0.3s ease-out;
+        }
+
+        @keyframes modalAppear {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .cancel-btn, .save-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .cancel-btn {
+            background: #6c757d;
+            color: white;
+        }
+
+        .save-btn {
+            background: #1e3c72;
+            color: white;
+        }
+
+        .admin-dashboard {
+            background: rgba(30, 60, 114, 0.05);
+            border: 2px solid rgba(30, 60, 114, 0.1);
+            border-radius: 15px;
+            margin: 20px;
+            overflow: hidden;
+        }
+
+        .admin-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .admin-tabs {
+            display: flex;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background: white;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            color: #1e3c72;
+            background: rgba(30, 60, 114, 0.1);
+            border-bottom: 3px solid #1e3c72;
+        }
+
+        .tab-btn:hover {
+            background: rgba(30, 60, 114, 0.05);
+        }
+
+        .tab-content {
+            padding: 30px;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .rsvp-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .rsvp-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .export-btn, .clear-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .export-btn {
+            background: #28a745;
+            color: white;
+        }
+
+        .clear-btn {
+            background: #dc3545;
+            color: white;
+        }
+
+        .export-btn:hover {
+            background: #218838;
+        }
+
+        .clear-btn:hover {
+            background: #c82333;
+        }
+
+        .rsvp-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .rsvp-table th,
+        .rsvp-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .rsvp-table th {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            font-weight: 600;
+        }
+
+        .rsvp-table tr:hover {
+            background: rgba(30, 60, 114, 0.05);
+        }
+
+        .attending-yes {
+            background: #d4edda;
+            color: #155724;
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .attending-no {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .comment-row {
+            background: #f8f9fa;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #1e3c72;
+        }
+
+        .stat-label {
+            color: #666;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .chapter-breakdown {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .no-rsvps {
+            text-align: center;
+            color: #666;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 10px;
+        }
+
+        .no-rsvps p:first-child {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .control-section {
+            margin-bottom: 15px;
+        }
+
+        .control-label {
+            font-weight: 600;
+            color: #1e3c72;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .editable-field {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 8px 12px;
+            width: 100%;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            cursor: text;
+        }
+
+        .editable-field:focus {
+            border-color: #1e3c72;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
+        }
+
+        .form-section {
+            padding: 40px;
+        }
+
+        .form-title {
+            font-size: 2.2em;
+            color: #1e3c72;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            border-color: #1e3c72;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .form-select:focus {
+            border-color: #1e3c72;
+            outline: none;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 5px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .radio-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #1e3c72;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 30px auto 0;
+            box-shadow: 0 8px 20px rgba(30, 60, 114, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(30, 60, 114, 0.4);
+        }
+
+        .success-message {
+            background: #4caf50;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .radio-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .form-section {
+                padding: 20px;
+            }
+        }
+
+        .required {
+            color: #e74c3c;
+        }
+
+        .event-info {
+            background: rgba(30, 60, 114, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 4px solid #1e3c72;
+        }
+
+        .event-detail {
+            margin-bottom: 8px;
+            font-size: 1.05em;
+        }
+
+        .event-detail strong {
+            color: #1e3c72;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <button class="admin-toggle" onclick="showAdminLogin()">🔐 Admin Login</button>
+
+    <!-- Admin Login Modal -->
+    <div id="adminLoginModal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Admin Access Required</h3>
+            <p>Please enter the admin password to access event management:</p>
+            <input type="password" id="adminPassword" placeholder="Enter admin password" class="form-input" style="margin: 15px 0;">
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button onclick="closeAdminLogin()" class="cancel-btn">Cancel</button>
+                <button onclick="verifyAdminPassword()" class="save-btn">Login</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="muna-logo" id="logoContainer">
+                <img id="customLogo" class="custom-logo" alt="Organization Logo">
+                <div class="logo-circle" id="defaultLogo">
+                    <div class="default-logo-content">
+                        <div class="logo-crescent"></div>
+                        <div class="usa-map"></div>
+                        <div class="muna-text">MUNA</div>
+                    </div>
+                </div>
+            </div>
+            <h1>Event RSVP Form</h1>
+            <p>Please confirm your attendance</p>
+        </div>
+
+        <!-- Admin Dashboard -->
+        <div class="admin-dashboard hidden" id="adminDashboard">
+            <div class="admin-header">
+                <h2>🔧 Admin Dashboard</h2>
+                <button class="logout-btn" onclick="logoutAdmin()">🚪 Logout</button>
+            </div>
+
+            <div class="admin-tabs">
+                <button class="tab-btn active" onclick="showTab('event-settings')">Event Settings</button>
+                <button class="tab-btn" onclick="showTab('rsvp-list')">RSVP List</button>
+                <button class="tab-btn" onclick="showTab('statistics')">Statistics</button>
+            </div>
+
+            <!-- Event Settings Tab -->
+            <div class="tab-content active" id="event-settings">
+                <h3>📝 Event Configuration</h3>
+
+                <div class="control-section">
+                    <label class="control-label">Logo Upload:</label>
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                        <input type="file" id="logoUpload" accept="image/*" style="display: none;" onchange="handleLogoUpload(event)">
+                        <button onclick="document.getElementById('logoUpload').click()" style="background: #1e3c72; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">📁 Upload Logo</button>
+                        <button onclick="resetToDefaultLogo()" style="background: #6c757d; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">🔄 Reset to MUNA</button>
+                        <span id="logoStatus" style="font-size: 0.9em; color: #666;">🔄 Using default MUNA logo</span>
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <label class="control-label">Program Name:</label>
+                    <input type="text" class="editable-field" id="programName" value="Education Session & Community Gathering" placeholder="Enter program name">
+                </div>
+
+                <div class="form-row">
+                    <div class="control-section">
+                        <label class="control-label">Date:</label>
+                        <input type="text" class="editable-field" id="eventDate" value="Sunday, September 14, 2025" placeholder="Enter event date">
+                    </div>
+                    <div class="control-section">
+                        <label class="control-label">Time Slot:</label>
+                        <input type="text" class="editable-field" id="timeSlot" value="10:00 AM - 6:00 PM" placeholder="Enter time slot">
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <label class="control-label">Place:</label>
+                    <input type="text" class="editable-field" id="eventPlace" value="Masjid Salman Al Farshi Mosque" placeholder="Enter venue">
+                </div>
+
+                <div class="control-section">
+                    <label class="control-label">Organized By:</label>
+                    <input type="text" class="editable-field" id="organizedBy" value="MUNA Georgia Chapter" placeholder="Enter organizing body">
+                </div>
+
+                <div class="control-section">
+                    <label class="control-label">Admin Password:</label>
+                    <input type="password" class="editable-field" id="newAdminPassword" placeholder="Enter new admin password">
+                    <button onclick="changeAdminPassword()" style="background: #e74c3c; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; margin-top: 5px;">Change Password</button>
+                </div>
+
+                <button onclick="updateEventInfo()" style="background: #1e3c72; color: white; border: none; padding: 12px 24px; border-radius: 5px; cursor: pointer; margin-top: 20px; font-size: 1.1em;">📝 Update Event Info</button>
+            </div>
+
+            <!-- RSVP List Tab -->
+            <div class="tab-content" id="rsvp-list">
+                <div class="rsvp-header">
+                    <h3>📋 RSVP Submissions</h3>
+                    <div class="rsvp-actions">
+                        <button onclick="exportRSVPs()" class="export-btn">📊 Export CSV</button>
+                        <button onclick="clearAllRSVPs()" class="clear-btn">🗑️ Clear All</button>
+                    </div>
+                </div>
+                <div id="rsvpTableContainer">
+                    <div class="no-rsvps">
+                        <p>📭 No RSVP submissions yet</p>
+                        <p>RSVPs will appear here once people start registering</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Tab -->
+            <div class="tab-content" id="statistics">
+                <h3>📊 Event Statistics</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalRSVPs">0</div>
+                        <div class="stat-label">Total RSVPs</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="attendingCount">0</div>
+                        <div class="stat-label">Attending</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="notAttendingCount">0</div>
+                        <div class="stat-label">Not Attending</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalAdults">0</div>
+                        <div class="stat-label">Total Adults</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalKids">0</div>
+                        <div class="stat-label">Total Children</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalPeople">0</div>
+                        <div class="stat-label">Total People</div>
+                    </div>
+                </div>
+
+                <div class="chapter-breakdown">
+                    <h4>📍 Chapter Breakdown</h4>
+                    <div id="chapterStats">
+                        <p>No data available yet</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h2 class="form-title">RSVP Registration</h2>
+
+            <!-- Event Information Display -->
+            <div class="event-info" id="eventDisplay">
+                <div class="event-detail"><strong>Program:</strong> <span id="displayProgramName">Education Session & Community Gathering</span></div>
+                <div class="event-detail"><strong>Date:</strong> <span id="displayDate">Sunday, September 14, 2025</span></div>
+                <div class="event-detail"><strong>Time:</strong> <span id="displayTime">10:00 AM - 6:00 PM</span></div>
+                <div class="event-detail"><strong>Venue:</strong> <span id="displayPlace">Masjid Salman Al Farshi Mosque</span></div>
+                <div class="event-detail"><strong>Organized by:</strong> <span id="displayOrganizer">MUNA Georgia Chapter</span></div>
+            </div>
+
+            <form id="rsvpForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">First Name <span class="required">*</span></label>
+                        <input type="text" class="form-input" name="firstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Last Name <span class="required">*</span></label>
+                        <input type="text" class="form-input" name="lastName" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Sub-Chapter Name</label>
+                    <select class="form-select" name="subChapter">
+                        <option value="">Select your sub-chapter</option>
+                        <option value="Georgia Chapter">Georgia Chapter</option>
+                        <option value="Florida Chapter">Florida Chapter</option>
+                        <option value="Alabama Chapter">Alabama Chapter</option>
+                        <option value="South Carolina Chapter">South Carolina Chapter</option>
+                        <option value="North Carolina Chapter">North Carolina Chapter</option>
+                        <option value="Tennessee Chapter">Tennessee Chapter</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Will you be attending? <span class="required">*</span></label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="attendingYes" name="attending" value="inshallah_yes" required>
+                            <label for="attendingYes">Yes, In Sha Allah</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="attendingNo" name="attending" value="no" required>
+                            <label for="attendingNo">No, Cannot Attend</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Adults Count <span class="required">*</span></label>
+                        <select class="form-select" name="headCount" required>
+                            <option value="">Select count</option>
+                            <option value="1">1 Adult</option>
+                            <option value="2">2 Adults</option>
+                            <option value="3">3 Adults</option>
+                            <option value="4">4 Adults</option>
+                            <option value="5">5 Adults</option>
+                            <option value="6+">6+ Adults</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Children Count</label>
+                        <select class="form-select" name="kidsCount">
+                            <option value="0">No Children</option>
+                            <option value="1">1 Child</option>
+                            <option value="2">2 Children</option>
+                            <option value="3">3 Children</option>
+                            <option value="4">4 Children</option>
+                            <option value="5">5 Children</option>
+                            <option value="6+">6+ Children</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Additional Comments (Optional)</label>
+                    <textarea class="form-input" name="comments" rows="3" placeholder="Any special requirements, dietary restrictions, or comments..."></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn">Submit RSVP</button>
+
+                <div class="success-message" id="successMessage">
+                    ✅ Jazakallahu Khairan! Your RSVP has been submitted successfully.
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let adminMode = false;
+        let currentLogo = 'default';
+        let adminPassword = 'admin123'; // Default password - change this in production
+        let rsvpSubmissions = [];
+
+        // Admin Login Functions
+        function showAdminLogin() {
+            document.getElementById('adminLoginModal').classList.remove('hidden');
+            document.getElementById('adminPassword').focus();
+        }
+
+        function closeAdminLogin() {
+            document.getElementById('adminLoginModal').classList.add('hidden');
+            document.getElementById('adminPassword').value = '';
+        }
+
+        function verifyAdminPassword() {
+            const enteredPassword = document.getElementById('adminPassword').value;
+
+            if (enteredPassword === adminPassword) {
+                // Login successful
+                adminMode = true;
+                closeAdminLogin();
+                showAdminDashboard();
+                updateStatistics();
+                displayRSVPList();
+                showNotification('Welcome to Admin Dashboard!', 'success');
+            } else {
+                // Login failed
+                showNotification('Incorrect password. Please try again.', 'error');
+                document.getElementById('adminPassword').value = '';
+                document.getElementById('adminPassword').focus();
+            }
+        }
+
+        function showAdminDashboard() {
+            document.getElementById('adminDashboard').classList.remove('hidden');
+            const toggleBtn = document.querySelector('.admin-toggle');
+            toggleBtn.textContent = '🔒 Exit Admin';
+            toggleBtn.style.background = '#e74c3c';
+            toggleBtn.onclick = logoutAdmin;
+        }
+
+        function logoutAdmin() {
+            adminMode = false;
+            document.getElementById('adminDashboard').classList.add('hidden');
+            const toggleBtn = document.querySelector('.admin-toggle');
+            toggleBtn.textContent = '🔐 Admin Login';
+            toggleBtn.style.background = '#1e3c72';
+            toggleBtn.onclick = showAdminLogin;
+            showNotification('Logged out successfully', 'success');
+        }
+
+        function changeAdminPassword() {
+            const newPassword = document.getElementById('newAdminPassword').value;
+
+            if (newPassword.length < 6) {
+                showNotification('Password must be at least 6 characters long', 'error');
+                return;
+            }
+
+            adminPassword = newPassword;
+            document.getElementById('newAdminPassword').value = '';
+            showNotification('Admin password updated successfully!', 'success');
+        }
+
+        // Tab Management
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+
+            // Update data when switching to relevant tabs
+            if (tabName === 'rsvp-list') {
+                displayRSVPList();
+            } else if (tabName === 'statistics') {
+                updateStatistics();
+            }
+        }
+
+        // RSVP Management Functions
+        function displayRSVPList() {
+            const container = document.getElementById('rsvpTableContainer');
+
+            if (rsvpSubmissions.length === 0) {
+                container.innerHTML = `
+                    <div class="no-rsvps">
+                        <p>📭 No RSVP submissions yet</p>
+                        <p>RSVPs will appear here once people start registering</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let tableHTML = `
+                <table class="rsvp-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Sub-Chapter</th>
+                            <th>Attending</th>
+                            <th>Adults</th>
+                            <th>Children</th>
+                            <th>Total</th>
+                            <th>Submitted</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            rsvpSubmissions.forEach((rsvp, index) => {
+                const attendingClass = rsvp.attending === 'inshallah_yes' ? 'attending-yes' : 'attending-no';
+                const attendingText = rsvp.attending === 'inshallah_yes' ? 'Yes, In Sha Allah' : 'Cannot Attend';
+                const totalPeople = parseInt(rsvp.headCount || 0) + parseInt(rsvp.kidsCount || 0);
+
+                tableHTML += `
+                    <tr>
+                        <td><strong>${rsvp.firstName} ${rsvp.lastName}</strong></td>
+                        <td>${rsvp.subChapter || 'Not specified'}</td>
+                        <td><span class="${attendingClass}">${attendingText}</span></td>
+                        <td>${rsvp.headCount}</td>
+                        <td>${rsvp.kidsCount}</td>
+                        <td><strong>${totalPeople}</strong></td>
+                        <td>${rsvp.submittedAt}</td>
+                        <td><button onclick="deleteRSVP(${index})" style="background:#dc3545;color:white;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;">🗑️</button></td>
+                    </tr>
+                `;
+
+                if (rsvp.comments) {
+                    tableHTML += `
+                        <tr class="comment-row">
+                            <td colspan="8" style="font-style:italic;color:#666;padding-left:20px;">💬 ${rsvp.comments}</td>
+                        </tr>
+                    `;
+                }
+            });
+
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+
+            container.innerHTML = tableHTML;
+        }
+
+        function deleteRSVP(index) {
+            if (confirm('Are you sure you want to delete this RSVP?')) {
+                rsvpSubmissions.splice(index, 1);
+                displayRSVPList();
+                updateStatistics();
+                showNotification('RSVP deleted successfully');
+            }
+        }
+
+        function clearAllRSVPs() {
+            if (confirm('Are you sure you want to clear ALL RSVP submissions? This cannot be undone.')) {
+                rsvpSubmissions = [];
+                displayRSVPList();
+                updateStatistics();
+                showNotification('All RSVPs cleared');
+            }
+        }
+
+        function exportRSVPs() {
+            if (rsvpSubmissions.length === 0) {
+                showNotification('No RSVPs to export', 'error');
+                return;
+            }
+
+            let csv = 'First Name,Last Name,Sub-Chapter,Attending,Adults,Children,Total People,Comments,Submitted At\n';
+
+            rsvpSubmissions.forEach(rsvp => {
+                const totalPeople = parseInt(rsvp.headCount || 0) + parseInt(rsvp.kidsCount || 0);
+                const attendingText = rsvp.attending === 'inshallah_yes' ? 'Yes In Sha Allah' : 'Cannot Attend';
+
+                csv += `"${rsvp.firstName}","${rsvp.lastName}","${rsvp.subChapter || ''}","${attendingText}","${rsvp.headCount}","${rsvp.kidsCount}","${totalPeople}","${rsvp.comments || ''}","${rsvp.submittedAt}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `MUNA_RSVP_Export_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+
+            showNotification('RSVP data exported successfully!');
+        }
+
+        function updateStatistics() {
+            const totalRSVPs = rsvpSubmissions.length;
+            const attendingCount = rsvpSubmissions.filter(r => r.attending === 'inshallah_yes').length;
+            const notAttendingCount = rsvpSubmissions.filter(r => r.attending === 'no').length;
+
+            let totalAdults = 0;
+            let totalKids = 0;
+            let chapterCounts = {};
+
+            rsvpSubmissions.forEach(rsvp => {
+                if (rsvp.attending === 'inshallah_yes') {
+                    totalAdults += parseInt(rsvp.headCount || 0);
+                    totalKids += parseInt(rsvp.kidsCount || 0);
+                }
+
+                const chapter = rsvp.subChapter || 'Not specified';
+                chapterCounts[chapter] = (chapterCounts[chapter] || 0) + 1;
+            });
+
+            const totalPeople = totalAdults + totalKids;
+
+            // Update statistics display
+            document.getElementById('totalRSVPs').textContent = totalRSVPs;
+            document.getElementById('attendingCount').textContent = attendingCount;
+            document.getElementById('notAttendingCount').textContent = notAttendingCount;
+            document.getElementById('totalAdults').textContent = totalAdults;
+            document.getElementById('totalKids').textContent = totalKids;
+            document.getElementById('totalPeople').textContent = totalPeople;
+
+            // Update chapter breakdown
+            const chapterStats = document.getElementById('chapterStats');
+            if (Object.keys(chapterCounts).length === 0) {
+                chapterStats.innerHTML = '<p>No data available yet</p>';
+            } else {
+                let chapterHTML = '';
+                Object.entries(chapterCounts).forEach(([chapter, count]) => {
+                    chapterHTML += `<div style="display: flex; justify-content: space-between; margin-bottom: 8px;"><span>${chapter}:</span><strong>${count} RSVPs</strong></div>`;
+                });
+                chapterStats.innerHTML = chapterHTML;
+            }
+        }
+
+        // Logo functions
+        function handleLogoUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                if (!file.type.startsWith('image/')) {
+                    showNotification('Please select a valid image file.', 'error');
+                    return;
+                }
+
+                if (file.size > 5 * 1024 * 1024) {
+                    showNotification('Image file size should be less than 5MB.', 'error');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const customLogo = document.getElementById('customLogo');
+                    const defaultLogo = document.getElementById('defaultLogo');
+                    const logoStatus = document.getElementById('logoStatus');
+
+                    customLogo.src = e.target.result;
+                    customLogo.style.display = 'block';
+                    defaultLogo.style.display = 'none';
+
+                    currentLogo = 'custom';
+                    logoStatus.textContent = `✅ Custom logo uploaded (${file.name})`;
+                    logoStatus.style.color = '#4caf50';
+
+                    showNotification('Logo uploaded successfully!');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function resetToDefaultLogo() {
+            const customLogo = document.getElementById('customLogo');
+            const defaultLogo = document.getElementById('defaultLogo');
+            const logoStatus = document.getElementById('logoStatus');
+            const logoUpload = document.getElementById('logoUpload');
+
+            customLogo.style.display = 'none';
+            customLogo.src = '';
+            defaultLogo.style.display = 'flex';
+            logoUpload.value = '';
+
+            currentLogo = 'default';
+            logoStatus.textContent = '🔄 Using default MUNA logo';
+            logoStatus.style.color = '#666';
+
+            showNotification('Logo reset to default MUNA logo');
+        }
+
+        function updateEventInfo() {
+            const programName = document.getElementById('programName').value;
+            const eventDate = document.getElementById('eventDate').value;
+            const timeSlot = document.getElementById('timeSlot').value;
+            const eventPlace = document.getElementById('eventPlace').value;
+            const organizedBy = document.getElementById('organizedBy').value;
+
+            document.getElementById('displayProgramName').textContent = programName;
+            document.getElementById('displayDate').textContent = eventDate;
+            document.getElementById('displayTime').textContent = timeSlot;
+            document.getElementById('displayPlace').textContent = eventPlace;
+            document.getElementById('displayOrganizer').textContent = organizedBy;
+
+            showNotification('Event information updated successfully!');
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            const bgColor = type === 'error' ? '#e74c3c' : '#4caf50';
+
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                background: ${bgColor};
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                z-index: 1000;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                animation: slideIn 0.3s ease-out;
+                max-width: 300px;
+            `;
+            notification.textContent = message;
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out forwards';
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle form submission
+            document.getElementById('rsvpForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const formData = new FormData(this);
+                const data = {};
+
+                for (let [key, value] of formData.entries()) {
+                    data[key] = value;
+                }
+
+                // Add timestamp
+                data.submittedAt = new Date().toLocaleString();
+
+                // Add to submissions array
+                rsvpSubmissions.push(data);
+
+                console.log('RSVP Submission:', data);
+
+                // Show success message
+                document.getElementById('successMessage').style.display = 'block';
+
+                // Scroll to success message
+                document.getElementById('successMessage').scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+
+                // Reset form after 3 seconds
+                setTimeout(() => {
+                    this.reset();
+                    document.getElementById('successMessage').style.display = 'none';
+                }, 3000);
+
+                // Update statistics if admin is logged in
+                if (adminMode) {
+                    updateStatistics();
+                    displayRSVPList();
+                }
+            });
+
+            // Keyboard shortcuts for admin login
+            document.getElementById('adminPassword').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    verifyAdminPassword();
+                }
+            });
+
+            // Close modal on background click
+            document.getElementById('adminLoginModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeAdminLogin();
+                }
+            });
+
+            // Auto-save admin changes
+            document.querySelectorAll('.editable-field').forEach(field => {
+                field.addEventListener('input', function() {
+                    // Auto-update display when admin makes changes
+                    if (adminMode) {
+                        setTimeout(updateEventInfo, 500);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
